@@ -1,0 +1,39 @@
+name: Build, Push and Deploy Docker Image 
+on: 
+push: 
+branches: - main 
+jobs: 
+build-push-deploy: 
+runs-on: ubuntu-latest 
+    steps: 
+      - name: Clonar repositorio 
+        uses: actions/checkout@v4 
+ 
+      - name: Iniciar sesión en Docker Hub 
+        uses: docker/login-action@v3 
+        with: 
+          username: ${{ secrets.DOCKERHUB_USERNAME }} 
+          password: ${{ secrets.DOCKERHUB_TOKEN }} 
+ 
+      - name: Construir imagen Docker 
+        run: | 
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/dev.ops-ev2:latest . 
+ 
+      - name: Subir imagen a Docker Hub 
+        run: | 
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/dev.ops-ev2:latest 
+ 
+      - name: Desplegar en EC2 AWS Academy 
+        uses: appleboy/ssh-action@v1.0.3 
+        with: 
+          host: ${{ secrets.EC2_HOST }} 
+          username: ${{ secrets.EC2_USER }} 
+          key: ${{ secrets.EC2_SSH_KEY }} 
+          script: | 
+            docker stop dev.ops-ev2 || true 
+            docker rm dev.ops-ev2 || true 
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dev.ops-ev2:latest 
+            docker run -d \ 
+              --name dev.ops-ev2 \ 
+              -p 8080:8080 \ 
+              ${{ secrets.DOCKERHUB_USERNAME }}/dev.ops-ev2:latest
