@@ -42,5 +42,5 @@ jobs:
             docker pull "${{ secrets.DOCKERHUB_USERNAME }}/dev.ops-ev2:latest"
             docker run -d \
               --name dev.ops-ev2 \
-              -p 8080:8080 \
+              -p 5000:5000 \
               "${{ secrets.DOCKERHUB_USERNAME }}/dev.ops-ev2:latest"
