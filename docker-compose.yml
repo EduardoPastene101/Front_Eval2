@@ -1,0 +1,21 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: frontend_proyecto
+
+    ports:
+      - "${PORT:-5000}:5000"
+
+    env_file:
+      - .env.example
+
+    environment:
+      PORT: ${PORT:-5000}
+      DEBUG: ${DEBUG:-False}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:3000}
+      SECRET_KEY: ${SECRET_KEY:-dev_secret_key}
+
+    restart: unless-stopped
